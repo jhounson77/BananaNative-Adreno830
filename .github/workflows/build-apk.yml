@@ -27,10 +27,10 @@ jobs:
         with:
           dotnet-version: '10.0.x'
 
-- name: Configurar Android SDK
-  uses: android-actions/setup-android@v3
-  with:
-    packages: 'platform-tools'
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+       with:
+          packages: 'platform-tools'
 
       - name: Instalar ferramentas
         run: |
