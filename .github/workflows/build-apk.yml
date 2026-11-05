@@ -3,6 +3,71 @@ name: Build Banana Native APK
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15-intel
+    timeout-minutes: 120
+
+    steps:
+      - name: Baixar codigo-fonte
+        uses: actions/checkout@v4
+
+      - name: Configurar Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Configurar .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+
+      - name: Configurar Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Instalar ferramentas
+        run: |
+          brew install ninja cmake
+          yes | sdkmanager --licenses
+          sdkmanager --install \
+            "platforms;android-36" \
+            "build-tools;36.0.0" \
+            "ndk;28.2.13676358" \
+            "cmake;3.31.5"
+
+      - name: Configurar variaveis Android
+        run: |
+          echo "ANDROID_NDK_HOME=$ANDROID_HOME/ndk/28.2.13676358" >> $GITHUB_ENV
+          echo "ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/28.2.13676358" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=$ANDROID_HOME" >> $GITHUB_ENV
+          mkdir -p android/app
+          printf 'sdk.dir=%s\n' "$ANDROID_HOME" > android/app/local.properties
+
+      - name: Construir ferramentas nativas
+        run: |
+          zsh android/ondevice/build.sh "$RUNNER_TEMP/nx-work"
+
+      - name: Compilar APK
+        run: |
+          cd android/app
+          chmod +x gradlew
+          ./gradlew --no-daemon \
+            -PnxPackStage="$RUNNER_TEMP/nx-work/stage" apk
+
+      - name: Localizar APK
+        run: |
+          find android/app -type f -name "*.apk" -print
+
+      - name: Disponibilizar APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BananaNative-Adreno830-APK
+          path: |
+            android/app/out/nxnative-android.apk
+            android/app/build/outputs/apk/**/*.apk
+          if-no-files-found: error
