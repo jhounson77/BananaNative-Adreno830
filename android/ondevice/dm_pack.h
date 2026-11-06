@@ -2,7 +2,7 @@
 // in CPython 3.14 embedded in the calling process, one tool at a time, each as `python3 <tool> <args>` would run it.
 //
 // Library: libnxpack.so (android/ondevice/build.sh), needs libpython3.14.so (loaded first, or found by the dynamic linker).
-// The Python home is a folder with lib/python3.14/ (the standard library, lib-dynload/ and site-packages/ with capstone and lz4) as build.sh stages it;
+// The Python home is a folder with lib/python3.14/ (the standard library, lib-dynload/ and site-packages/ with capstone, lz4 and zbic) as build.sh stages it;
 // the app copies it from its assets into its private storage (extension modules are loaded with dlopen from there; nothing is executed as a program).
 //
 // Threads: any thread may call dm_pack_run; runs are serialized (one tool at a time per process, they share one interpreter). A tool must not fork:

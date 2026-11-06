@@ -46,7 +46,7 @@ for a in "$@"; do
     esac
 done
 
-# ---- Packages: git and Python; a zstd reader (3.14's compression.zstd, or backports.zstd built by clang) ----
+# ---- Packages: git and Python; a zstd reader (3.14's compression.zstd, or backports.zstd built by clang); zbic (a Switch 2 module's ZBIC segments, built by clang) ----
 say '- installing the packages the probe needs (git, python, python-pip)...'
 for p in git python python-pip; do
     pkg install -y "$p" >/dev/null 2>&1 || { say "pkg install -y $p failed — run 'pkg update -y' once, then this script again"; exit 1; }
@@ -60,6 +60,15 @@ else
     python3 -m pip install --quiet backports.zstd || die 'pip install backports.zstd failed'
     python3 -c 'from backports import zstd' >/dev/null 2>&1 || die 'backports.zstd does not import after installing'
     say '  zstd reader: backports.zstd'
+fi
+if python3 -c 'import zbic' >/dev/null 2>&1; then
+    say '  zbic (ZBIC modules): present'
+else
+    say '- no zbic: installing it (a Switch 2 module stores its segments as ZBIC, the zstd variant of system 22.0.0; builds with clang)...'
+    pkg install -y clang >/dev/null 2>&1 || die "pkg install -y clang failed — run 'pkg update -y' once, then this script again"
+    python3 -m pip install --quiet zbic || die 'pip install zbic failed'
+    python3 -c 'import zbic' >/dev/null 2>&1 || die 'zbic does not import after installing'
+    say '  zbic: installed'
 fi
 
 # ---- Shared storage: the .nup lives there (the permission dialog needs one tap) ----

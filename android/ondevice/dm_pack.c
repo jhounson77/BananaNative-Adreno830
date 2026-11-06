@@ -74,7 +74,7 @@ int dm_pack_init(const char *home) {
     PyConfig c; PyStatus st;
     PyConfig_InitIsolatedConfig(&c);   // no PYTHON* variables, no user site, no current folder on sys.path
     c.install_signal_handlers = 0;     // the app's runtime owns the signals
-    c.site_import = 1;                 // site-packages (capstone, lz4)
+    c.site_import = 1;                 // site-packages (capstone, lz4, zbic)
     st = PyConfig_SetBytesString(&c, &c.home, home);
     if (!PyStatus_Exception(st)) st = PyConfig_SetBytesString(&c, &c.program_name, "python3");
     if (!PyStatus_Exception(st)) st = Py_InitializeFromConfig(&c);

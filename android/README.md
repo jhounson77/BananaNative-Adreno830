@@ -13,11 +13,11 @@ The Android port of the host: one launcher APK (`android/app`) that holds the ho
 
 ## The environment
 
-The packer runs the rewriter, which needs Capstone 5 and lz4 (`pyproject.toml`, dependency group `android-pack`). Keep the environment on the dump drive, not in the home folder:
+The packer runs the rewriter, which needs Capstone 5, lz4 and zbic (a Switch 2 module stores its segments as ZBIC, Nintendo's zstd variant; `pyproject.toml`, dependency group `android-pack`). Keep the environment on the dump drive, not in the home folder:
 
 ```sh
 micromamba create -p <dump folder>/.venv-nxnative python=3.12 -c conda-forge
-<dump folder>/.venv-nxnative/bin/python -m pip install "capstone>=5,<6" lz4
+<dump folder>/.venv-nxnative/bin/python -m pip install "capstone>=5,<6" lz4 zbic
 ```
 
 Capstone comes from pip: conda-forge's Capstone 5 finds its library only through `CONDA_PREFIX`, so it fails when the environment's Python is run without activating it.

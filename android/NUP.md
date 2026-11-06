@@ -106,7 +106,7 @@ then download `scripts/nup_probe_termux.sh` from the repository (open the file o
 
     sh nup_probe_termux.sh [<repository URL>] [<file>.nup]
 
-The script installs what is missing (a zstd reader: Termux's Python when it is 3.14, else `pip install backports.zstd`, which builds with clang), clones the repository when the script is not run from a checkout (a private repository: paste the token when git asks), renames an upper-case `.NUP` to `.nup`, finds the `.nup` on shared storage when it is not named (three levels under `/sdcard`, and the home folder), and runs `scripts/nup_probe.py` with the report beside the `.nup` (`<name>_probe.md`). The report holds title and build IDs, sizes and listings only — no game content — so it can be sent back or attached to an issue (CONTRIBUTING.md, "Never game files or keys"); the draft `game.tsv` inside it is the profile a port starts from.
+The script installs what is missing (a zstd reader: Termux's Python when it is 3.14, else `pip install backports.zstd`, which builds with clang; `zbic` for a Switch 2 module's ZBIC segments, likewise built by clang), clones the repository when the script is not run from a checkout (a private repository: paste the token when git asks), renames an upper-case `.NUP` to `.nup`, finds the `.nup` on shared storage when it is not named (three levels under `/sdcard`, and the home folder), and runs `scripts/nup_probe.py` with the report beside the `.nup` (`<name>_probe.md`). The report holds title and build IDs, sizes and listings only — no game content — so it can be sent back or attached to an issue (CONTRIBUTING.md, "Never game files or keys"); the draft `game.tsv` inside it is the profile a port starts from.
 
 ## Test data
 
