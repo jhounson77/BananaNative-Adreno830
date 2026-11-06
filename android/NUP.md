@@ -96,6 +96,18 @@ the rest after it is unambiguous. Tools take these wherever they take the matchi
 - Tests: `NupJvmTest` (javac + java, no Gradle runner yet; see its header): 293 checks on a synthetic `.nup`, 30 on the
   real DKB one.
 
+## Surveying a .nup on the phone (no PC)
+
+A title with no profile yet is surveyed on the phone itself, in Termux (the F-Droid build; the GitHub Play build is stale), so the dump never needs a computer:
+
+    pkg install -y git python python-pip && termux-setup-storage
+
+then download `scripts/nup_probe_termux.sh` from the repository (open the file on github.com and take its Raw view) into the home folder, and:
+
+    sh nup_probe_termux.sh [<repository URL>] [<file>.nup]
+
+The script installs what is missing (a zstd reader: Termux's Python when it is 3.14, else `pip install backports.zstd`, which builds with clang), clones the repository when the script is not run from a checkout (a private repository: paste the token when git asks), renames an upper-case `.NUP` to `.nup`, finds the `.nup` on shared storage when it is not named (three levels under `/sdcard`, and the home folder), and runs `scripts/nup_probe.py` with the report beside the `.nup` (`<name>_probe.md`). The report holds title and build IDs, sizes and listings only — no game content — so it can be sent back or attached to an issue (CONTRIBUTING.md, "Never game files or keys"); the draft `game.tsv` inside it is the profile a port starts from.
+
 ## Test data
 
 Tested with a `040074A01BF12000` dump (base, update 458752, add-on `040074a01bf13001`) as an official `.nup` and as a folder,
