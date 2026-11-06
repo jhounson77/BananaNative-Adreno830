@@ -3,41 +3,41 @@
 # The dump is a .nup (android/NUP.md) whose update package (0400486024DEC800, v131072) carries the whole game; main.npdm's program ID is the base's.
 
 # ---- Identity ----
-title_id	0400486024DEC000
-program_id	0400486024DEC000
+title_id        0400486024DEC000
+program_id      0400486024DEC000
 
 # ---- App ----
-name	The Legend of Zelda: Ocarina of Time
-ipa	OcarinaOfTime.ipa
-app_category	public.app-category.action-games
-pad_layout	full
+name    The Legend of Zelda: Ocarina of Time
+ipa     OcarinaOfTime.ipa
+app_category    public.app-category.action-games
+pad_layout      full
 
 # ---- Versions ----
 # v131072 is the update's title version; a .nup carries no control data to name a display version
-build	v131072	v131072	main=e0f3ccfaf50065ae4ea01eb5aeb13b1a	subsdk0=b0110087a7b339ef74588d3bd0b4dd5d	sdk=1643a838814f9c10c696f930ed681e7f
-package	v131072
-shader_versions	v131072
+build   v131072 v131072 main=e0f3ccfaf50065ae4ea01eb5aeb13b1a   subsdk0=b0110087a7b339ef74588d3bd0b4dd5d        sdk=1643a838814f9c10c696f930ed681e7f
+package v131072
+shader_versions v131072
 
 # ---- Files ----
 # load order as on Horizon: main, subsdk*, sdk (rtld is not listed, as on the other profiles; the survey's "what" column says what each is)
-modules	main subsdk0 sdk
+modules main subsdk0 sdk
 # unconfirmed: the probe's RomFS listing holds the 20 largest top folders (TerrainArc/..., Tex, Model, ...) and System/ is not one of them; the Android flow does not read it
-romfs_marker	System/Resource/ResourceSizeTable.Product.rsizetable.zs
+romfs_marker    System/Resource/ResourceSizeTable.Product.rsizetable.zs
 # the engine family's set, as Donkey Kong Bananza and Mario Kart World; the probe reads no file headers, so unmeasured until the first pack
-zip_store	.zs:.bwav:.webm:.metallib
+zip_store       .zs:.bwav:.webm:.metallib
 
 # ---- Memory ----
 # The NPDM declares 48 MB of system resource (virtual address memory on, as Mario Kart World's 64 MB): nninitStartup sets the heap to the free application memory less a fixed
 # reserve. The rows below are Mario Kart World's map (the same engine and path), not measured on this game - the heap request and the alias fills are the bring-up's to read
 # from the phone's log: 256 MB stack region, a 4 GB alias region, the 9 GB pool the Switch 2 leaves games (as Donkey Kong Bananza)
-mem_reserve	0x300000000
-mem_alias	0x100000000
-mem_stack	0x10000000
-app_pool	0x240000000
-sys_resource	0x3000000
+mem_reserve     0x300000000
+mem_alias       0x100000000
+mem_stack       0x10000000
+app_pool        0x240000000
+sys_resource    0x3000000
 
 # ---- Shader split (shader_split.py) ----
-# the engine family's NVN2 layout, as Donkey Kong Bananza and Mario Kart World: Shader/*.Nin_Ounce_NVN2.bfsha.zs. Effect/ is in the RomFS listing; Shader/ and UI/ are
-# not among the 20 largest (they would not be), unconfirmed until the first split
-shader_groups	/Shader/=shader /Effect/=effect /UI/=layout
-shader_note	The Legend of Zelda: Ocarina of Time shaders
+# measured by the phone split (the Prepare job, 2026-11-07): it cut ps/vs/cs_effect.bin (from /Effect/), ps/vs/cs_shader.bin (from /Shader/) and ps/vs/cs/ts/ms_other.bin
+# (the rest: /Lib/, /Layout2Shader/, main); no /UI/ sources exist, so the UI group yields nothing (kept, as the family's row)
+shader_groups   /Shader/=shader /Effect/=effect /UI/=layout
+shader_note     The Legend of Zelda: Ocarina of Time shaders
