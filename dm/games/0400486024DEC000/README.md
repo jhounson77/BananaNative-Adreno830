@@ -18,8 +18,12 @@ The phone split (2026-11-07, the Prepare job's `dm/gfx/tools/shader_split.py` ru
 
 ## Open
 
-- Nothing has booted: the first phone run measures the memory map and whatever the SDK 22.2.8 host coverage misses — this is the first profile on an SDK 22 build, and `dm/tools/sdk_patches.py`'s cuts are per-SDK-build. The Prepare job reached the shaders step (rewrite and split done, the split's tables committed here); the first translate and the first boot are next.
+- The first phone boot (2026-11-07) gets far: the engine-family memory map holds (heap 6.20 GB, alias fills as the family's), NVN2 comes up (window 2560x1440, 3 textures, pools placed by parts), audren renders on the CPU backend and the engine's threads run to about 1.3 s in. The boot's first stop was the `auddmg:u` connect ([the audio damage service `auddmg:u` at boot](../../../docs/reference/services.md#the-audio-damage-service-auddmgu-at-boot)), served since. The rest of the boot is the next run's to read (this profile is the first on an SDK 22 build, and `dm/tools/sdk_patches.py`'s cuts are per-SDK-build).
 - `romfs_marker` names a file every EPD RomFS carries (`System/Resource/ResourceSizeTable.Product.rsizetable.zs`), but the exact name on this SDK is unconfirmed (the probe's listing holds the 20 largest top folders only); the Android flow does not read the key.
 - `romfs_check`: no row yet. Donkey Kong Bananza checks line 4 of `System/RegionLangMask.txt` against main's build ID; whether this game's file carries the same line is unconfirmed.
 - The display version is unknown (a `.nup` carries no control data): the build rows say `v131072` on both columns, as Pokémon Pokopia's do.
 - The window size getters (`window_fn`), the render-condition and GPU-timestamp behaviour are the bring-up's to find (Mario Kart World needed `render_cond on`; the same engine suggests the same, unconfirmed here).
+
+## Found on this game
+
+- [The audio damage service `auddmg:u` at boot](../../../docs/reference/services.md#the-audio-damage-service-auddmgu-at-boot): the SDK 22 audio library opens it once the renderer runs and aborts on the refused connect; served since.

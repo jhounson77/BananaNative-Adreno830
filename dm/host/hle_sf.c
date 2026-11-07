@@ -15,7 +15,11 @@
 #define SF_MAX 64
 static struct { char name[16]; int used, domain; unsigned seen; } g_sf[SF_MAX];
 static pthread_mutex_t g_sf_mu = PTHREAD_MUTEX_INITIALIZER;
-static const char *const sf_served[] = {"olsc:u"};
+// auddmg:u (Switch 2): the SDK 22 audio library opens the system's audio damage service once the renderer
+// runs, and aborts on the refused connect with nn::audio's own result (0xa99, module 153; Ocarina of Time
+// at boot, sdk+0x1f61ac, audren already rendering). What the service carries is unconfirmed (the name reads
+// as the output-damage monitor), so the zeroed answers read as the monitor idle and every default off
+static const char *const sf_served[] = {"olsc:u", "auddmg:u"};
 
 static int sf_slot(uint32_t h) {
     unsigned i = h - SF_H0;

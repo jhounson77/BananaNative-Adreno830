@@ -54,6 +54,13 @@ Most service calls can be found before they crash, before the first boot or the 
 - **Fix:** `hle_sf.c` takes over the SDK's HIPC client entry points (`InitializeHipcServiceResolution`, `ConnectToHipcService`, `SendSyncRequest`, `CloseClientSessionHandle` and the control requests `QueryPointerBufferSize`, `ConvertSessionToDomain`, `DuplicateSession(Ex)`): a service it serves (`olsc:u`) gets a host session, and every request on it succeeds with zeroed output, which reads as backup off for every user. Any other name is refused with a red line, as `sm` refuses a service nobody registered (`npns` was never connected). `DM_SF_TRACE=1` dumps each request.
 - **Found on:** [Animal Crossing: New Horizons](../../dm/games/01006F8002326000/README.md) (SDK 20.5.4).
 
+### The audio damage service `auddmg:u` at boot
+
+- **Symptom:** `[RED] sf: the game connects to service auddmg:u itself, which the host does not serve`, then `game called nn::diag abort: Result 0xa99` in `sdk`, once the audio renderer is up and the engine's threads run.
+- **Cause:** the Switch 2 SDK's audio library (SDK 22) opens the system's audio damage service (`auddmg:u`) itself, right after the renderer starts; what the service carries is unconfirmed (the name reads as the output-damage monitor). The refused connect (`sm`'s ResultNotRegistered) the SDK answers with its own abort (`0xa99`, nn::audio's result module).
+- **Fix:** `auddmg:u` joined `sf_served` in `hle_sf.c`: a host session whose every request succeeds with zeroed output, which reads as the monitor idle and every default off. `DM_SF_TRACE=1` dumps each request, so the service's protocol can be read from a boot log if one is ever needed.
+- **Found on:** [The Legend of Zelda: Ocarina of Time](../../dm/games/0400486024DEC000/README.md) (SDK 22.2.8).
+
 ## SDK names that changed between versions
 
 ### Older SDK names for the same calls
