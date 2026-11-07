@@ -70,4 +70,3 @@ void dm_audio_reset(void);   // iOS media services reset: recreate the AudioUnit
 // An nn::gs::NativeSyncHandle (16 bytes, magic first) the host made that never signals: GameChat's camera pictures, which never come (no camera; hle_misc.c). nn::gs::TryWaitNativeSync (hle_codec_video.c) reads it as not reached
 #define DM_SYNC_NEVER 0x4e436d44u   // 'DmCN'
 uint32_t dm_sf_host_session(const char *name);   // hle_sf.c: a session the host answers (success, zeroed output) for a service the game reaches without sm
-int dm_npln_import(const char *module, const char *name, uint64_t *out);   // hle_npln.c: the stub for an import of a _ZN2nn4npln symbol (NPLN never runs), 0 when the name is not one
