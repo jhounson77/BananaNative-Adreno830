@@ -135,13 +135,17 @@ android {
     }
     signingConfigs {
         if (nxLive) live { storeFile file(signStore); storePassword signPass; keyAlias signAlias; keyPassword signPass }
+        // Test builds (CI and local): the repository's own debug.keystore, so every APK keeps one signer and
+        // updates over the last one. A machine's ~/.android/debug.keystore is fresh where none exists (a CI
+        // runner, a new PC), and an APK signed by a new key is refused as an update ("App not installed")
+        stable { storeFile file('debug.keystore'); storePassword 'android'; keyAlias 'androiddebugkey'; keyPassword 'android' }
     }
     buildTypes {
-        debug { jniDebuggable true }
+        debug { jniDebuggable true; signingConfig signingConfigs.stable }
         release {
             minifyEnabled false
             debuggable !nxLive       // bring-up builds: run-as and the app's files stay reachable over adb; the release is not debuggable
-            signingConfig nxLive ? signingConfigs.live : signingConfigs.debug
+            signingConfig nxLive ? signingConfigs.live : signingConfigs.stable
         }
     }
     externalNativeBuild {
