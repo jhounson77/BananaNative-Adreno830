@@ -408,12 +408,18 @@ final class Ondevice {
                 return;
             }
             Profile prof = Profile.of(r.titleId);   // DumpCheck refused a dump without one
+            // The pack beside the job's working files (<id>-work/pack) when that folder is writable: shared storage keeps it over an app uninstall, and a reinstall
+            // finds it again through PackFind's <id>-work scan with this APK's shader library already in it, so Prepare does not run a second time. Inside the
+            // app's own storage (or when the folder cannot be made) the app's packs/<id> stays
+            File appPack = AppStorage.pack(a, r.titleId), workPack = new File(r.work, "pack");
+            File pack = workPack.getParentFile().isDirectory() || workPack.getParentFile().mkdirs() ? workPack : appPack;
             String text = String.format(Locale.getDefault(), "%s, %d DLC.\n\nThe app builds the game's pack and %,d shaders from your dump, once: %s "
-                    + "in the background, best on the charger. You can pause any time.\n\nNeeds about 1.5 GB (%.1f GB free): working files in %s, the pack in the app's storage (%s).",
-                    (r.version == 0 ? "Base game" : "Update " + r.version) + (r.build >= 0 && r.build != r.version ? " (the code of " + prof.buildName(r.build) + ")" : ""), r.dlc, prof.shaderTotal, ShaderLibs.jobMinutesText(prof.shaderTotal), r.free / 1073741824.0, r.work, AppStorage.pack(a, r.titleId));
+                    + "in the background, best on the charger. You can pause any time.\n\nNeeds about 1.5 GB (%.1f GB free): working files in %s, the pack in %s%s.",
+                    (r.version == 0 ? "Base game" : "Update " + r.version) + (r.build >= 0 && r.build != r.version ? " (the code of " + prof.buildName(r.build) + ")" : ""), r.dlc, prof.shaderTotal, ShaderLibs.jobMinutesText(prof.shaderTotal), r.free / 1073741824.0, r.work, pack.getPath(),
+                    pack.equals(appPack) ? " (the app's storage)" : " (beside the working files: it stays when the app is uninstalled)");
             Runnable go = () -> {
                 try {
-                    Job j = Job.create(r, AppStorage.pack(a, r.titleId));
+                    Job j = Job.create(r, pack);
                     if (packOverride != null) j.pack(packOverride);
                     j.save();
                     Job.remember(a, j.file);

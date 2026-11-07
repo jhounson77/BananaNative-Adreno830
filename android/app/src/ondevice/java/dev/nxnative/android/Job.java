@@ -47,8 +47,9 @@ final class Job {
     static File fileOf(File work) { return new File(new File(work, "ondevice"), "job.json"); }
 
     /**
-     * A new job for a checked dump; not written yet. pack: where its pack goes, the app's packs/&lt;title ID&gt; (AppStorage.pack); the working files stay in the
-     * dump's work folder (&lt;dump&gt;/../&lt;id&gt;-work/ondevice)
+     * A new job for a checked dump; not written yet. pack: where its pack goes — the caller's choice: the work folder's own pack/ (&lt;id&gt;-work/pack, shared storage:
+     * it survives an uninstall and a reinstall finds it through PackFind's &lt;id&gt;-work scan) when that folder is writable, else the app's packs/&lt;title ID&gt;
+     * (AppStorage.pack); the working files stay in the dump's work folder (&lt;dump&gt;/../&lt;id&gt;-work/ondevice)
      */
     static Job create(DumpCheck.Result r, File appPack) throws JSONException {
         JSONObject o = new JSONObject().put("format", FORMAT).put("title_id", r.titleId).put("name", Profile.of(r.titleId) != null ? Profile.of(r.titleId).name : r.titleId).put("version", r.version)
