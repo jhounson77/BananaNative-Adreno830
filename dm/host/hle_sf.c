@@ -15,11 +15,13 @@
 #define SF_MAX 64
 static struct { char name[16]; int used, domain; unsigned seen; } g_sf[SF_MAX];
 static pthread_mutex_t g_sf_mu = PTHREAD_MUTEX_INITIALIZER;
-// auddmg:u (Switch 2): the SDK 22 audio library opens the system's audio damage service once the renderer
-// runs, and aborts on the refused connect with nn::audio's own result (0xa99, module 153; Ocarina of Time
-// at boot, sdk+0x1f61ac, audren already rendering). What the service carries is unconfirmed (the name reads
-// as the output-damage monitor), so the zeroed answers read as the monitor idle and every default off
-static const char *const sf_served[] = {"olsc:u", "auddmg:u"};
+// auddmg:u (Switch 2) was served here from 67d8907 (the SDK 22 audio library opens the system's audio damage service once the renderer runs and aborts on the refused connect with
+// nn::audio's own result, 0xa99, module 153; Ocarina of Time at boot, sdk+0x1f61ac, audren already rendering) and 32047c9 (the proxy destructor's HIPC CloseSession right after the
+// connect), but the boot still ended in a null read at sdk+0x2ace08 just after the session closed: zeroed answers of a service whose protocol is unconfirmed are not something the
+// audio library survives. The Mac/iOS host has never served it either; its route past the service are the take-overs of the SDK's own virtual-device functions in hle_audio.c
+// (GetDefaultVirtualOutputDevice, the OutputStream pair, the virtual input list and its streams), which close over every auddmg:u connect the library makes. With those on, the game
+// never reaches sm for it, and a connect from any other path reads as the refused service's red line again
+static const char *const sf_served[] = {"olsc:u"};
 
 static int sf_slot(uint32_t h) {
     unsigned i = h - SF_H0;

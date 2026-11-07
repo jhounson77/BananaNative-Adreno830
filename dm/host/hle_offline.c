@@ -13,6 +13,20 @@ HLE_FORCE("_ZN2nn5prepo10InitializeEv", "telemetry init: the original connects t
 HLE_FORCE("_ZN2nn5prepo12AddSessionIdEPNS0_10PlayReportEPKc", "telemetry session ID: no service connection, nothing added, reports success", Result, h_prepo_AddSess, void *rep, const char *key) { (void)rep; (void)key; return RES_OK; }
 HLE_FORCE("_ZN2nn5prepo27AddInternetConnectionStatusEPNS0_10PlayReportEPKcS4_S4_", "telemetry internet connection status: no service connection, nothing added, reports success", Result, h_prepo_AddNet, void *rep, const char *a, const char *b, const char *c) { (void)rep; (void)a; (void)b; (void)c; return RES_OK; }
 HLE_FORCE("_ZN2nn5prepo28RequestImmediateTransmissionEv", "telemetry immediate upload; nothing is sent, reports success", Result, h_prepo_Tx, void) { return RES_OK; }
+// PlayReport::Send sends the report asynchronously and returns a nontrivial AsyncContext through the caller's x8 storage; the SDK's own version connects to prepo:u for it, and the game
+// aborts at the first gameplay transition when that connection fails (Ocarina of Time, 0400486024DEC000; the Mac/iOS host's "an asynchronous play report opens prepo:u"). The SDK's
+// AsyncContext(Result) constructor builds a completed context with no IPC object, so the host calls it on the caller's storage and the game reads the send as done. PLAT_ASM_SYM: the
+// Mach-O build's C symbols carry a leading underscore, the ELF builds' do not
+static void prepo_complete_send(void *out) __attribute__((used));
+static void prepo_complete_send(void *out) {
+    void (*init)(void *, Result) = guest_sym("_ZN2nn5prepo12AsyncContextC1ENS_6ResultE");
+    if (!init) die("prepo: missing AsyncContext(Result) constructor");
+    init(out, RES_OK);
+}
+static void h_prepo_SendU(void) __attribute__((naked));
+HLE_FORCE("_ZN2nn5prepo10PlayReport4SendERKNS_7account3UidE", "telemetry send (user); completes offline without a service session", void, h_prepo_SendU, void) {
+    __asm__("mov x0, x8\n\tb " PLAT_ASM_SYM(prepo_complete_send));
+}
 
 // ---------- ldn: local wireless. Initialization fails, state is always "none" ----------
 HLE_FORCE("_ZN2nn3ldn10InitializeEv", "local wireless (cut): initialization fails", Result, h_ldn_Init, void) { return RES_FAIL; }
