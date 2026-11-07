@@ -359,6 +359,13 @@ static uint64_t bind_sym(module_t *m, const Elf64_Sym *s, int *other, int *weak0
     // An undefined weak symbol that no module defines and the host does not implement is 0, as Horizon's rtld binds it: the code tests its address before calling it.
     // Octopath Traveler 0's main imports the thread_local init function _ZTHN13LowLevelTasks5FTask10ActiveTaskE weakly; a named stub made it look defined and the game called it
     const char *nm = m->strtab + s->st_name;
+    // NPLN (hle_npln.c): nn::npln, Nintendo's network platform library, is statically linked into the Switch 2 sdk module; on the host its runtime has no backend behind it
+    // and it aborts on that (Ocarina of Time: a bare nn::diag abort at sdk+0xb8fe8, 0.3 s into the NPLN setup, the grpc executor threads just up). None of it runs: the game's
+    // non-weak imports of _ZN2nn4npln symbols go to the host's named stubs (return 0), so a boot that needs more than the zero answers stops at one of those calls, readably
+    if (!v && !s->st_shndx && ELF64_ST_BIND(s->st_info) != STB_WEAK) {
+        uint64_t np;
+        if (dm_npln_import(m->name, nm, &np)) return np;
+    }
     *weak0 = !v && !s->st_shndx && ELF64_ST_BIND(s->st_info) == STB_WEAK && !loaded_sym(nm) && !hle_implements(nm);
     if (!v && !*weak0) v = resolve_sym(m, nm);
     return v;
